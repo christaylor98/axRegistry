@@ -1,0 +1,190 @@
+// axis-types.axreg — the fundamental type vocabulary for the canonical set.
+//
+// AXREG_LAYERING_VALUE_OWNERSHIP_V1 states that a type name is owned by
+// exactly one file: the --reg loader is flat, and declaring the same type
+// name in two files is a hard error regardless of load order and regardless
+// of whether the two declarations are textually identical.
+//
+// That rule was documented but never enforced in the files. `axis.axreg` and
+// `axis-bridge.axreg` both declared Unit/Bool/Int/Text/Value/Dec/ValueList/Fn,
+// so the canonical set could not be loaded at all:
+//
+//   Registry conflict: duplicate type name 'Unit' —
+//     declared in axis.axreg and axis-bridge.axreg
+//
+// This file now owns EVERY type in the canonical set. `axis.axreg` and
+// `axis-bridge.axreg` declare none. It contains zero fns by construction:
+// types are content-hashed from their canonical TypeDef, fns carry authored
+// identities, and keeping the two in separate files keeps that distinction
+// visible.
+//
+// WHICH DECLARATIONS THESE ARE
+// ----------------------------
+// Six of the eight shared names (Unit, Bool, Int, Text, Dec, Fn) were
+// byte-identical in both files and are unchanged.
+//
+// `Value` was NOT. The two files declared genuinely different types:
+//
+//   axis.axreg         type Value = prim value                  id 212f4f49…
+//   axis-bridge.axreg  type Value = sum [ AsUnit | AsBool |     id 23945287…
+//                                         AsInt  | AsText ]
+//
+// and `ValueList = list Value` inherited the difference (47b62fb6… vs
+// f6673941…). Unifying them is a semantic choice, not a mechanical merge.
+//
+// The bridge's declarations are the ones kept, because they are the ones in
+// use: `axis.axreg` declares ZERO fns, so nothing referenced its `prim value`
+// variant, while `axis-bridge.axreg`'s 411 fns reference the sum variant
+// throughout. Keeping the bridge's definitions leaves every fn signature in
+// the canonical set byte-identical; keeping axis.axreg's would have silently
+// re-typed 411 contracts.
+//
+// NOTE: the lab's `axis-surface-m1-config/m1-registry.axreg` still declares
+// `Value = prim value`. It is not part of this canonical set and is not
+// loaded alongside these files, so it does not conflict — but the two
+// vocabularies do disagree about what `Value` means. That reconciliation is
+// a separate concern and is deliberately NOT decided here.
+
+registry axis-types 0.5
+
+// ─────────── primitive types ───────────
+
+type Unit = prim unit
+type Int  = prim int
+type Text = prim text
+type Bool = prim bool
+
+// Value: the sum over the bridge's runtime variants that this grammar can
+// express. Used to type genuinely polymorphic bridge fns (io_println,
+// io_print, io_eprint, debug_trace) honestly. The arms are what makes an
+// implicit widening legal: `type_admits` (validation/core_ir.rs) accepts a
+// CCall arg of type T where `in (Value)` is declared iff some arm has exactly
+// one payload and that payload is T. So a MISSING ARM IS A REJECTED PROGRAM,
+// not a cosmetic omission.
+//
+// It previously read "the closed, finite typing vocabulary: it cannot grow
+// because the bridge runtime cannot produce a value outside these variants",
+// listing four arms. That was false in both halves, and the false half is why
+// the omission survived: `runtime/value.rs` has TEN variants — Int, Bool, Str,
+// Unit, Tuple, List, Ctor, Dec, Float, Bytes — and `type Bytes = prim bytes`
+// is declared thirty lines below, in this same file, by a registry that had
+// just asserted the runtime could not produce one. Measured cost of the three
+// missing scalar arms, before adding them: passing a Dec, a Float or a Bytes
+// into any `in (Value)` slot failed with TypeMismatch, while Text/Int/Bool
+// passed. Adding an arm cannot break an existing caller — see the identity
+// note below.
+//
+// THREE RUNTIME VARIANTS REMAIN UNDECLARED, AND CANNOT BE DECLARED HERE.
+// Value::Tuple(Vec<Value>), Value::List(Vec<Value>) and
+// Value::Ctor{tag, fields} are all recursive: their payload is Value, or a
+// list of it. This grammar has no recursive types. Writing the honest arm
+// `AsList(ValueList)` — with ValueList = list Value — is rejected by the
+// loader at load time:
+//
+//   cannot resolve type(s) [Value, ValueList] — unknown referenced type
+//   name or dependency cycle
+//
+// which is the correct answer to an ill-founded definition, not a bug to work
+// around. The consequence is a real and permanent hole: a ValueList or a
+// Tuple can never implicitly widen into a `Value` slot. It costs nothing
+// today because both already travel as their own declared types
+// (`in (ValueList)`, and tcp_listen's tuple is declared `out Value`), so no
+// widening site exists. Declare any new fn that must take "a list or a
+// scalar" as two fns, not one `Value` fn.
+//
+// WHY ADDING AN ARM IS SAFE. An arm changes this type's STRUCTURAL identity
+// (registry/core05/codec.rs `type_identity` hashes the constructor list), but
+// a fn's identity is authored literally and never minted from its signature,
+// and a CCall records only that authored `target_identity`. So no fn identity,
+// no body hash and no bundle identity moves when an arm is added — verified by
+// recompiling the same source against a 4-arm and an 8-arm Value and diffing:
+// byte-identical bundles. That is the convenient half. The unsettling half is
+// the same fact stated backwards: NOTHING TIES THIS DECLARATION TO
+// `runtime/value.rs`, so the two drift silently and no hash moves to say so.
+// `tests/registry_value_arms.rs` in axis-codegen-bridge-rs is the guard that
+// now fails the build when a variant is added to the enum without being
+// resolved here.
+//
+// WHAT THE MISSING RECURSIVE ARMS ACTUALLY COST. Threading structured state
+// through `loop_while` is the clean fix for "a fixed-arity callback cannot
+// carry context", and it WORKS — `value_make(Text(host), Int(port), Int(0))`
+// through `loop_while(seed, pred, step, Int(10))` runs — but the state has no
+// declarable type. The composite must register `in (Value) out Value` while
+// its body claims `Int`, leaning on "the registry declares the contract, the
+// body declares the lowering". So the recommended pattern is one the type
+// system cannot describe. That is the use case that most wants
+// `AsList(ValueList)` to become expressible; it is the argument to weigh if
+// recursive types are ever put on the table.
+//
+// DO NOT "FIX" THE FORWARD REFERENCES BELOW. This declaration names Dec, Float
+// and Bytes before their own `type` lines. That is legal: the loader resolves
+// the type graph order-independently, verified by loading
+// `type Value = sum [ AsDec(Dec) ]` above `type Dec = prim dec`. Moving this
+// line down changes nothing. What DOES fail is wrapping the arms across lines
+// — a type declaration is one line — and that failure reports on this line,
+// which has been misread once as a declaration-order problem. Keep it on one
+// line and leave it where it is.
+type Value = sum [ AsUnit(Unit) | AsBool(Bool) | AsInt(Int) | AsText(Text) | AsDec(Dec) | AsFloat(Float) | AsBytes(Bytes) ]
+
+// TextList: a homogeneous list of Text — e.g. str_split's output. Uses the 0.5
+// List type shape (shape_kind 3). Its length/emptiness ops are named
+// text_list_len / text_list_is_empty; the unprefixed list_len / list_is_empty
+// are the ValueList ones. There are no generics, so each element type needs
+// its own list type and its own named ops.
+type TextList = list Text
+
+// ValueList: a homogeneous list of Value — used by the M1 iteration primitives
+// (foreach, range, flat_map, zip, etc.). Analogous to TextList but over Value.
+type ValueList = list Value
+
+// Bytes: opaque byte blob (PrimCode 4). Added by BRIDGE_BYTES_IO_M1 to carry
+// content for fs_read_bytes / fs_write_bytes / text_to_bytes.
+type Bytes = prim bytes
+
+// Fn: a registry function reference passed as an argument (fn-ref-by-name).
+// Per core_ir_spec/axis-core-ir-0.5.md (constant pool): a fn-ref is a typed
+// constant pool entry whose defHash is this Fn type and whose payload is
+// the target fn's 32-byte minted identity hash. No inline lambda abstraction.
+type Fn = prim fn
+
+// Dec/Float: numeric prims used by the value-coercion family
+// (bridge_to_dec/bridge_to_float/int_to_dec/…). Mirror of the bridge registry.
+type Dec   = prim dec
+type Float = prim float
+
+// Handle / HandleList: task handles for spawn / join (tasks.rs).
+//
+// A Handle IS the (handleId, result) pair. `spawn` returns one with the result
+// slot set to Unit; the slot is populated ONLY on termination of the task's
+// thread, by `join`. So `join` is HandleList in, HandleList out — the same
+// handles, their results filled — and there is no separate result type to keep
+// in step with this one.
+//
+// The pair is also what makes this a real type rather than a comment. List and
+// product types are hashed STRUCTURALLY, so `HandleList = list Int` would have
+// been byte-identical to IntList below and every list of integers would have
+// verified clean as a handle list. `list (product (Int, Value))` collides with
+// nothing, so handing `join` the wrong list is a TypeMismatch.
+//
+// The result is typed Value, not a type variable: workers joined together need
+// not agree on a return type, and each result carries its own Value tag.
+type Handle     = product (Int, Value)
+type HandleList = list Handle
+
+// ─── BEGIN GENERATED: M1_MONOMORPHIC_LIST_VOCABULARY_V1 / types ───
+// IntList: a monomorphic list of Int. Distinct type identity, enforced at the
+// contract boundary — a IntList where a ValueList is wanted is a TypeMismatch,
+// and vice versa. List types are hashed STRUCTURALLY, so this identity is
+// `list Int` regardless of the name.
+type IntList = list Int
+
+// BoolList: a monomorphic list of Bool. Distinct type identity, enforced at the
+// contract boundary — a BoolList where a ValueList is wanted is a TypeMismatch,
+// and vice versa. List types are hashed STRUCTURALLY, so this identity is
+// `list Bool` regardless of the name.
+type BoolList = list Bool
+
+// ─── END GENERATED: M1_MONOMORPHIC_LIST_VOCABULARY_V1 / types ───
+
+// FloatList (hand-written 2026-10-12, Chris approved): a monomorphic list of Float, the IntList pattern; list types are hashed structurally, so the identity is `list Float`.
+type FloatList = list Float

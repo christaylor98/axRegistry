@@ -1,0 +1,74 @@
+// axis-bridge-gfx.axreg -- the frame command stream (F24, axMachina, approved by Chris 2026-10-12): a program draws by building a frame (a byte string of drawing commands)
+// and handing it to the bridge. Six foreign functions, one name, one signature and one behaviour on every bridge; the binding is axis-bridge-gfx.dispatch.toml (one row per fn:
+// a missing row for a declared fn is a build error). Frame format and rules: axis-codegen-bridge-rs src/runtime/gfx.rs. Resource and key argument per fn: axis-bridge-gfx.effects.tsv.
+// Identities are sha256(name) (§5b). A build sees these names only when it passes this file (--reg) and the dispatch file (--dispatch).
+//
+// TEST-ONLY HOOKS of the native bridge (environment variables; each is read only to ADD a test aid, and none changes behaviour when unset):
+//   AXGFX_DUMP=<file>              append every submitted frame to the file (truncated at gfx_open); the frame-stream recorder
+//   AXGFX_NULL=1                   gfx_open succeeds without a window: the rules run, nothing is drawn (tests, recording, no display)
+//   AXGFX_DRAWLOG=<file>           the null renderer logs "draw<TAB>seq<TAB>commands" for every frame it is asked to draw
+//   AXGFX_NULL_ESCAPE_AFTER=<n>    the null renderer reports an Escape key press after its n-th frame
+//   AXGFX_STREAM=<host:port>       NOT a test hook but the transport: gfx_open connects to a stream renderer (bin axgfx_render of the bridge) and the frames go there; events come back through gfx_poll
+//   (renderer process only) AXGFX_RENDER_DELAY_MS=<n>   TEST-ONLY: every frame takes n ms longer to draw (a slow renderer); AXGFX_DUMP / AXGFX_DRAWLOG / AXGFX_NULL as above, renderer side
+//   AXGFX_HIDDEN=1   TEST-ONLY (window renderer): after its first frame the window asks to be minimized (REQ-F22 v3 acceptance 5, a run with the window out of sight); a compositor may ignore the request. The renderer also reports its events "refresh<TAB>13.33 ms" (the display refresh period, once known), "visible<TAB>0|1" (on change) and the once-a-second "presented" line with the refresh period and the visible flag: these are results, not hooks.
+// Program code never reads or sets them; a program's behaviour and its frames are the same with or without them.
+
+fn gfx_open
+  identity 0x7a5ef3c82259c9b72cd10b8f67b8fc682eca6b54aafd58c051d5ae34e1bb7ad0
+  kind     leaf
+  deterministic false
+  idempotent    false
+  in (Int, Int, Text)
+  out Bool
+  effect writes
+end
+
+fn gfx_submit
+  identity 0xc0be190900848eb2a181c9df3c9b4e78c598f9a39f3fbd1e27ac4a21b2a29a78
+  kind     leaf
+  deterministic false
+  idempotent    false
+  in (Bytes)
+  out Bool
+  effect writes
+end
+
+fn gfx_poll
+  identity 0x143e16dc1932feed39abac6c1f5e5338d28db185ad34950e9e3d8e0020b908f9
+  kind     leaf
+  deterministic false
+  idempotent    false
+  in (Unit)
+  out Text
+  effect writes
+end
+
+fn gfx_size
+  identity 0x1375cff104f51b67df289d04b25ed4d6bb375408e6f0600b14f23c2fa1093f27
+  kind     leaf
+  deterministic false
+  idempotent    false
+  in (Unit)
+  out Text
+  effect reads
+end
+
+fn gfx_close
+  identity 0x37a7e8c3aab36d0b9846add946bb1885410ef0b045aedb56efbbcd51badfd4af
+  kind     leaf
+  deterministic false
+  idempotent    false
+  in (Unit)
+  out Unit
+  effect writes
+end
+
+fn clock_ms
+  identity 0xd6f19622ca599d35fbf6ce36623d7b3d50962ca0f989a46a8f0b046049c98036
+  kind     leaf
+  deterministic false
+  idempotent    false
+  in (Unit)
+  out Int
+  effect reads
+end

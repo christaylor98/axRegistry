@@ -1,0 +1,271 @@
+// axis-bridge-world.axreg -- the W1 world layer (axMachina v2 codegen layer, axm-req-r99, 2026-10-09).
+// Effects are slots to the outer world; the code between them stays pure. Every w_ fn goes through one switch
+// (AX_WORLD = real | record:<file> | replay:<file>, axis-codegen-bridge-rs src/runtime/world.rs) and returns a
+// result instead of panicking ("Ok:..." / "Err:<reason>"; w_run a record (exit, stdout, stderr)). w_get / w_set
+// are in-process state, never recorded. A new layer: legacy fns are untouched, and a build sees these names only
+// when it passes this file (--reg) and axis-bridge-world.dispatch.toml (--dispatch to the bridge). Resource and
+// key argument per fn: axis-bridge-world.effects.tsv. Identities are sha256(name) (§5b).
+fn w_read
+  identity 0xda950ce80b180c33ac3db41fe88f7f2e733a3761912cd41f438fff5be8ee18fb
+  kind     leaf
+  deterministic false
+  idempotent    true
+  in (Text)
+  out Text
+  effect reads
+end
+fn w_exists
+  identity 0x32ec1e03b80b638166945db0958682f3ab98620b78983f04665c7befc72db046
+  kind     leaf
+  deterministic false
+  idempotent    true
+  in (Text)
+  out Bool
+  effect reads
+end
+fn w_list
+  identity 0x18b3151475944e9c19e8d62439bcdce5209d772c28cab0646d210d5ca7fa504a
+  kind     leaf
+  deterministic false
+  idempotent    true
+  in (Text)
+  out Text
+  effect reads
+end
+fn w_args
+  identity 0x70fd5ff0d464c8fe2f0d54a539e78f2f32550f0ae30f9eb3b0b3136fd94c31b6
+  kind     leaf
+  deterministic false
+  idempotent    true
+  in (Unit)
+  out Text
+  effect reads
+end
+fn w_env
+  identity 0x365824064253a62fc637920d120a3bbd0bb1f8e7d9f2a1f4fd428e02d97b5ee6
+  kind     leaf
+  deterministic false
+  idempotent    true
+  in (Text)
+  out Text
+  effect reads
+end
+fn w_now
+  identity 0x889b0209424ee2150cef9252ea89e8522fcf875137d5a58d9149dd3904e23818
+  kind     leaf
+  deterministic false
+  idempotent    true
+  in (Unit)
+  out Int
+  effect reads
+end
+fn w_write
+  identity 0xe9cc37939c06dcc326751ce51a1e0a26bb000f68a36d877059aaac1b6d3aa545
+  kind     leaf
+  deterministic false
+  idempotent    false
+  in (Text, Text)
+  out Text
+  effect writes
+end
+fn w_append
+  identity 0xe637ee6aedf0df1064cb938c3db2560574f66c185ae70a419908410f86e11ad9
+  kind     leaf
+  deterministic false
+  idempotent    false
+  in (Text, Text)
+  out Text
+  effect writes
+end
+fn w_mkdir
+  identity 0x4f75451fb8bb39cde335343e75d0487a76357dbda5b78612e19f36b439176a3e
+  kind     leaf
+  deterministic false
+  idempotent    false
+  in (Text)
+  out Text
+  effect writes
+end
+fn w_print
+  identity 0x119cf570666e54ab3c6a9d54c1c152e9dc55ebfe522871f8a5c4628477d8ddeb
+  kind     leaf
+  deterministic false
+  idempotent    false
+  in (Text)
+  out Unit
+  effect writes
+end
+fn w_eprint
+  identity 0x7e713e0dda4f58f9be4dea28068aa86e408f27088076cec790532e472d9ff573
+  kind     leaf
+  deterministic false
+  idempotent    false
+  in (Text)
+  out Unit
+  effect writes
+end
+fn w_exit
+  identity 0x193dc72b0c07ef1b902f95e6dd0cf497869fe833233adba4a3fa189a93f6af0d
+  kind     leaf
+  deterministic false
+  idempotent    false
+  in (Int)
+  out Unit
+  effect writes
+end
+fn w_run
+  identity 0x3ae041f662bf5cf07fcfa9dc72f9d5c99771414cbb958c2f235c523f8371c954
+  kind     leaf
+  deterministic false
+  idempotent    false
+  in (Text)
+  out Value
+  effect fullIo
+end
+fn w_get
+  identity 0xb00abe91c4b2a30ad523f530ceeae7d5aeba356ebcd565d7fa7dbb505fbdd053
+  kind     leaf
+  deterministic false
+  idempotent    true
+  in (Text, Text)
+  out Text
+  effect reads
+end
+fn w_set
+  identity 0xae7e230a9a10f0a89541c0bd43edd1a970bbddb2aef27342db5c36e00377e99b
+  kind     leaf
+  deterministic false
+  idempotent    false
+  in (Text, Text, Text)
+  out Unit
+  effect writes
+end
+// ---- G1 line ops (codegen layer, 2026-10-09): pure ops over line-oriented text, groomed for code generation
+// (axis-codegen-bridge-rs src/runtime/lines.rs). A text is read as lines (split on "\n", a final "" after a trailing
+// newline dropped); a result is written as lines, each followed by "\n". Columns are tab-separated, 0-based. Total.
+fn lines_nonblank
+  identity 0x29312f35bc10060fe89b77d4ce24fc864f8328e45228cad79a2d76a7306346f9
+  kind     leaf
+  deterministic true
+  idempotent    true
+  in (Text)
+  out Text
+  effect pure
+end
+fn lines_reverse
+  identity 0x146669a6d572f0ce3e1be32b5e763c48bd885fdc28c99e2e18292fb41be54342
+  kind     leaf
+  deterministic true
+  idempotent    true
+  in (Text)
+  out Text
+  effect pure
+end
+fn lines_count
+  identity 0x13fdbb7f4fbc6313b687b8a5ebaca71f7a64db2e9ad5c9276838b40b8cbaf3a5
+  kind     leaf
+  deterministic true
+  idempotent    true
+  in (Text)
+  out Int
+  effect pure
+end
+fn lines_with_prefix
+  identity 0x785c416565ea6dc0d0c635846c4b5728f2e4a184e0f6caac95b4935ed73ab8ad
+  kind     leaf
+  deterministic true
+  idempotent    true
+  in (Text, Text)
+  out Text
+  effect pure
+end
+fn lines_containing
+  identity 0x8b3108fa023ed123503c054af0b70798d53f6e77a1c351349dea8781ea0a2975
+  kind     leaf
+  deterministic true
+  idempotent    true
+  in (Text, Text)
+  out Text
+  effect pure
+end
+fn lines_col_eq
+  identity 0x1f5cb5a108dbea1c99be221ae937bf16fd827d8db456a3f595fe426a7e3acf4b
+  kind     leaf
+  deterministic true
+  idempotent    true
+  in (Text, Int, Text)
+  out Text
+  effect pure
+end
+fn lines_col_ne
+  identity 0xb6c8a565cd708e9bfa527b43837e3fc5077c844b64f82d4ec22ebfd3ad9ab609
+  kind     leaf
+  deterministic true
+  idempotent    true
+  in (Text, Int, Text)
+  out Text
+  effect pure
+end
+fn lines_head_cols
+  identity 0xbf547922b42c559f2a6db67c29a48328d567144a4f78097a248f5395d4572d14
+  kind     leaf
+  deterministic true
+  idempotent    true
+  in (Text, Int)
+  out Text
+  effect pure
+end
+fn lines_col_of
+  identity 0xbea44592e9406baacb90ec2436158c47f602d45906b031db96cd73c384804fc4
+  kind     leaf
+  deterministic true
+  idempotent    true
+  in (Text, Text, Int)
+  out Text
+  effect pure
+end
+fn fbank_free
+  identity 0xd259cd6e9217bc50af103886b008cd01ec6cdf769917919d0d41766c7635cb0c
+  kind     leaf
+  deterministic true
+  idempotent    false
+  in (Int)
+  out Unit
+  effect writes
+end
+fn str_nat_or
+  identity 0x88c87efe835b3377b02a11b7b20c790ee2fa237095a9e38574d662449f0d5229
+  kind     leaf
+  deterministic true
+  idempotent    true
+  in (Text, Int)
+  out Int
+  effect pure
+end
+fn prog_tokens
+  identity 0x25691a4fcc70b81cee5766f9b15c890cbcf7f4d47c1edde1f29adf7093d1f824
+  kind     leaf
+  deterministic true
+  idempotent    true
+  in (Text)
+  out TextList
+  effect pure
+end
+fn prog_spans
+  identity 0xaceea3233dceb3019a0c953852ca11d0a3432273e37e5b3544543cf23194011a
+  kind     leaf
+  deterministic true
+  idempotent    true
+  in (Text)
+  out TextList
+  effect pure
+end
+fn str_sim_ratio
+  identity 0xae9a9772703a34d806374b5730ceb4433432d29b4533949325ac536b219693ef
+  kind     leaf
+  deterministic true
+  idempotent    true
+  in (Text, Text)
+  out Int
+  effect pure
+end

@@ -1,0 +1,84 @@
+// axis-bridge-gpu.axreg -- the GPU search engine (axMachina P6, GPU_P5_V2, 2026-10-10): one size of the P5 search
+// on the GPU (gather, memo lookup, filtering, dedupe); kernels in Rust (axis-codegen-bridge-rs gpu-kernels/), op
+// semantics stay in AI3. Pair with axis-bridge-gpu.dispatch.toml.
+fn gpu_p5_open
+  identity 0xc5fd9dc1023c917649e0d229f51b7703802a0f7294142e3d04eaee5b5ad9b214
+  kind     leaf
+  in       (Int)
+  out      Int
+  effect   fullIo
+  deterministic false
+  idempotent    false
+end
+fn gpu_p5_size
+  identity 0x765d752de98c484c586804b81d5570368abfbd52bd14619ded365c29a9bf5b20
+  kind     leaf
+  in       (Int, TextList, Int, Bool, Int, Int, Int, Int, Text, Text)
+  out      Int
+  effect   fullIo
+  deterministic false
+  idempotent    false
+end
+fn gpu_p5_group_code
+  identity 0x12bc258f60bb756439345d97e19e6210c28609074620dae89af3acec39e70d0d
+  kind     leaf
+  in       (Int, Int)
+  out      Int
+  effect   fullIo
+  deterministic false
+  idempotent    false
+end
+fn gpu_p5_group_len
+  identity 0x71a758d41bee4608327359d3d833f1275d46d317eeb1b54b06901c040c03b1cc
+  kind     leaf
+  in       (Int, Int)
+  out      Int
+  effect   fullIo
+  deterministic false
+  idempotent    false
+end
+fn gpu_p5_group_args
+  identity 0xbecb30112087d75befb81bb853737b783fd3825bd2f0472c4b38de73098bf8c5
+  kind     leaf
+  in       (Int, Int, Int, Int, Int)
+  out      TextList
+  effect   fullIo
+  deterministic false
+  idempotent    false
+end
+fn gpu_p5_answer
+  identity 0x35e02e4575cf5cbb6cae6c7a154536bc98540165c0318171849641bebef9615c
+  kind     leaf
+  in       (Int, Int, Int, TextList)
+  out      Int
+  effect   fullIo
+  deterministic false
+  idempotent    false
+end
+fn gpu_p5_step
+  identity 0xab353a0dfb8a49cb95ff1d86717cba058aa24c016145b385298f8337f16d1dbe
+  kind     leaf
+  in       (Int)
+  out      Int
+  effect   fullIo
+  deterministic false
+  idempotent    false
+end
+fn gpu_p5_stats
+  identity 0xac8d53c8af5e5d95a31bba13980d4c1ea31078307c825928e0bc3fd20e291810
+  kind     leaf
+  in       (Int)
+  out      Text
+  effect   fullIo
+  deterministic false
+  idempotent    false
+end
+fn gpu_p5_close
+  identity 0xf574122163354564e235caf73da0b754345c03cabd1db22fb96e9b09835949a8
+  kind     leaf
+  in       (Int)
+  out      Unit
+  effect   fullIo
+  deterministic false
+  idempotent    false
+end

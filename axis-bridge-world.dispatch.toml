@@ -1,0 +1,147 @@
+# axis-bridge-world.dispatch.toml -- wires the W1 world layer (axis-bridge-world.axreg) into a bridge build:
+#   axis-codegen-bridge build ... --dispatch <this file>
+
+[[fn]]
+name = "w_read"
+path = "axis_codegen_bridge::runtime::world::w_read"
+native_args = ["Text"]
+
+[[fn]]
+name = "w_exists"
+path = "axis_codegen_bridge::runtime::world::w_exists"
+native_args = ["Text"]
+
+[[fn]]
+name = "w_list"
+path = "axis_codegen_bridge::runtime::world::w_list"
+native_args = ["Text"]
+
+[[fn]]
+name = "w_args"
+path = "axis_codegen_bridge::runtime::world::w_args"
+native_args = ["Value"]
+
+[[fn]]
+name = "w_env"
+path = "axis_codegen_bridge::runtime::world::w_env"
+native_args = ["Text"]
+
+[[fn]]
+name = "w_now"
+path = "axis_codegen_bridge::runtime::world::w_now"
+native_args = ["Value"]
+
+[[fn]]
+name = "w_write"
+path = "axis_codegen_bridge::runtime::world::w_write"
+native_args = ["Text", "Text"]
+
+[[fn]]
+name = "w_append"
+path = "axis_codegen_bridge::runtime::world::w_append"
+native_args = ["Text", "Text"]
+
+[[fn]]
+name = "w_mkdir"
+path = "axis_codegen_bridge::runtime::world::w_mkdir"
+native_args = ["Text"]
+
+[[fn]]
+name = "w_print"
+path = "axis_codegen_bridge::runtime::world::w_print"
+native_args = ["Text"]
+
+[[fn]]
+name = "w_eprint"
+path = "axis_codegen_bridge::runtime::world::w_eprint"
+native_args = ["Text"]
+
+[[fn]]
+name = "w_exit"
+path = "axis_codegen_bridge::runtime::world::w_exit"
+native_args = ["Int"]
+
+[[fn]]
+name = "w_run"
+path = "axis_codegen_bridge::runtime::world::w_run"
+native_args = ["Text"]
+
+[[fn]]
+name = "w_get"
+path = "axis_codegen_bridge::runtime::world::w_get"
+native_args = ["Text", "Text"]
+
+[[fn]]
+name = "w_set"
+path = "axis_codegen_bridge::runtime::world::w_set"
+native_args = ["Text", "Text", "Text"]
+
+[[fn]]
+name = "lines_nonblank"
+path = "axis_codegen_bridge::runtime::lines::lines_nonblank"
+native_args = ["Text"]
+
+[[fn]]
+name = "lines_reverse"
+path = "axis_codegen_bridge::runtime::lines::lines_reverse"
+native_args = ["Text"]
+
+[[fn]]
+name = "lines_count"
+path = "axis_codegen_bridge::runtime::lines::lines_count"
+native_args = ["Text"]
+
+[[fn]]
+name = "lines_with_prefix"
+path = "axis_codegen_bridge::runtime::lines::lines_with_prefix"
+native_args = ["Text", "Text"]
+
+[[fn]]
+name = "lines_containing"
+path = "axis_codegen_bridge::runtime::lines::lines_containing"
+native_args = ["Text", "Text"]
+
+[[fn]]
+name = "lines_col_eq"
+path = "axis_codegen_bridge::runtime::lines::lines_col_eq"
+native_args = ["Text", "Int", "Text"]
+
+[[fn]]
+name = "lines_col_ne"
+path = "axis_codegen_bridge::runtime::lines::lines_col_ne"
+native_args = ["Text", "Int", "Text"]
+
+[[fn]]
+name = "lines_head_cols"
+path = "axis_codegen_bridge::runtime::lines::lines_head_cols"
+native_args = ["Text", "Int"]
+
+[[fn]]
+name = "lines_col_of"
+path = "axis_codegen_bridge::runtime::lines::lines_col_of"
+native_args = ["Text", "Text", "Int"]
+
+[[fn]]
+name = "fbank_free"
+path = "axis_codegen_bridge::runtime::fbank::fbank_free"
+native_args = ["Int"]
+
+[[fn]]
+name = "str_nat_or"
+path = "axis_codegen_bridge::runtime::num::str_nat_or"
+native_args = ["Text", "Int"]
+
+[[fn]]
+name = "prog_tokens"
+path = "axis_codegen_bridge::runtime::prog::prog_tokens"
+native_args = ["Text"]
+
+[[fn]]
+name = "prog_spans"
+path = "axis_codegen_bridge::runtime::prog::prog_spans"
+native_args = ["Text"]
+
+[[fn]]
+name = "str_sim_ratio"
+path = "axis_codegen_bridge::runtime::num::str_sim_ratio"
+native_args = ["Text", "Text"]

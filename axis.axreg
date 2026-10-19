@@ -1,0 +1,42 @@
+// Axis canonical registry.
+//
+// Identities: §5b bootstrap rule — SHA-256 of the UTF-8 function name bytes.
+// New user-defined functions MUST use entropy-minted identities instead.
+//
+// This is the single semantic source. Surface registries are generated
+// projections of this file, not peers that can diverge from it.
+//
+// Vocabulary is in active development; callable contents will stabilise at v1.0.0.
+
+registry axis 0.5
+
+// ─────────── primitive types ───────────
+//
+// TYPES: axis-types.axreg owns Unit, Bool, Int, Text, Value, Dec, ValueList
+// and Fn. They were declared here until AXREG_LAYERING_VALUE_OWNERSHIP_V1
+// was actually enforced in the files; declaring any of them here again is a
+// hard load error (duplicate type name), not a shadow or an override.
+//
+// Two of them did not survive as declared HERE. This file's
+//   type Value     = prim value       (id 212f4f49…)
+//   type ValueList = list Value       (id 47b62fb6…)
+// differed from axis-bridge.axreg's closed-sum Value (23945287…) and its
+// ValueList (f6673941…). axis-types.axreg carries the BRIDGE definitions,
+// because this file declares zero fns — nothing referenced the `prim value`
+// variant, while 411 bridge fns reference the sum. See axis-types.axreg.
+
+// ─────────── boolean operations ───────────
+
+// ─────────── integer arithmetic ───────────
+
+// ─────────── integer comparisons ───────────
+
+// ─────────── text operations ───────────
+
+// ─────────── value construction primitives ───────────
+//
+// value_make / list_make are type-erased compiler primitives.
+// Surface type tags (Value(T1,..,Tn) / ValueList(T)) are checked and discharged
+// before lowering; the IR carries no tag. Variadic: actual call-site arity is
+// enforced at the surface, not here.
+

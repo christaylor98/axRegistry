@@ -1,0 +1,18 @@
+# axis-bridge-world.effects.tsv -- W2 effect metadata (axm-req-r100): fn, resource, access, key arg (the argument
+# naming the resource, "-" when none). Two calls touch the same resource exactly when resource and key value match.
+fn	resource	access	key_arg
+w_read	fs	read	0
+w_exists	fs	read	0
+w_list	fs	read	0
+w_args	argv	read	-
+w_env	env	read	0
+w_now	clock	read	-
+w_write	fs	write	0
+w_append	fs	write	0
+w_mkdir	fs	write	0
+w_print	stdout	write	-
+w_eprint	stderr	write	-
+w_exit	exit	write	-
+w_run	proc	both	-
+w_get	state	read	0
+w_set	state	write	0

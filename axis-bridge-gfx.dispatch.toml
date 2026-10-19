@@ -1,0 +1,33 @@
+# axis-bridge-gfx.dispatch.toml -- wires the frame command stream (axis-bridge-gfx.axreg) into a bridge build:
+#   axis-codegen-bridge build ... --reg axis-bridge-gfx.axreg --dispatch axis-bridge-gfx.dispatch.toml
+# This file IS the per-bridge binding table: native, WASM and Python bridges each have their own rows for the same six names.
+
+[[fn]]
+name = "gfx_open"
+path = "axis_codegen_bridge::runtime::gfx::gfx_open"
+native_args = ["Int", "Int", "Text"]
+
+[[fn]]
+name = "gfx_submit"
+path = "axis_codegen_bridge::runtime::gfx::gfx_submit"
+native_args = ["Bytes"]
+
+[[fn]]
+name = "gfx_poll"
+path = "axis_codegen_bridge::runtime::gfx::gfx_poll"
+native_args = ["Value"]
+
+[[fn]]
+name = "gfx_size"
+path = "axis_codegen_bridge::runtime::gfx::gfx_size"
+native_args = ["Value"]
+
+[[fn]]
+name = "gfx_close"
+path = "axis_codegen_bridge::runtime::gfx::gfx_close"
+native_args = ["Value"]
+
+[[fn]]
+name = "clock_ms"
+path = "axis_codegen_bridge::runtime::gfx::clock_ms"
+native_args = ["Value"]

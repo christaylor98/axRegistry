@@ -1,0 +1,47 @@
+# axis-bridge-gpu.dispatch.toml -- wires axis-bridge-gpu.axreg into a bridge build:
+#   axis-codegen-bridge build ... --dispatch <this file>
+
+[[fn]]
+name = "gpu_p5_open"
+path = "axis_codegen_bridge::runtime::gpu_p5::gpu_p5_open"
+native_args = ["Int"]
+
+[[fn]]
+name = "gpu_p5_size"
+path = "axis_codegen_bridge::runtime::gpu_p5::gpu_p5_size"
+native_args = ["Int", "Value", "Int", "Bool", "Int", "Int", "Int", "Int", "Text", "Text"]
+
+[[fn]]
+name = "gpu_p5_group_code"
+path = "axis_codegen_bridge::runtime::gpu_p5::gpu_p5_group_code"
+native_args = ["Int", "Int"]
+
+[[fn]]
+name = "gpu_p5_group_len"
+path = "axis_codegen_bridge::runtime::gpu_p5::gpu_p5_group_len"
+native_args = ["Int", "Int"]
+
+[[fn]]
+name = "gpu_p5_group_args"
+path = "axis_codegen_bridge::runtime::gpu_p5::gpu_p5_group_args"
+native_args = ["Int", "Int", "Int", "Int", "Int"]
+
+[[fn]]
+name = "gpu_p5_answer"
+path = "axis_codegen_bridge::runtime::gpu_p5::gpu_p5_answer"
+native_args = ["Int", "Int", "Int", "Value"]
+
+[[fn]]
+name = "gpu_p5_step"
+path = "axis_codegen_bridge::runtime::gpu_p5::gpu_p5_step"
+native_args = ["Int"]
+
+[[fn]]
+name = "gpu_p5_stats"
+path = "axis_codegen_bridge::runtime::gpu_p5::gpu_p5_stats"
+native_args = ["Int"]
+
+[[fn]]
+name = "gpu_p5_close"
+path = "axis_codegen_bridge::runtime::gpu_p5::gpu_p5_close"
+native_args = ["Int"]

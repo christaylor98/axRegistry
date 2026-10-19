@@ -1,0 +1,8 @@
+# axis-bridge-gfx.effects.tsv -- effect metadata: fn, resource, access, key arg ("-" when none).
+fn	resource	access	key_arg
+gfx_open	display	write	-
+gfx_submit	display	write	-
+gfx_poll	display	write	-
+gfx_size	display	read	-
+gfx_close	display	write	-
+clock_ms	clock	read	-

@@ -1,0 +1,64 @@
+// m1-builtins.axreg — additive curation of the M1 builtin fns into the
+// canonical registry set hosted in axAI/registries/.
+//
+// Hosted here (not loaded from axis-lang) so that BOTH the MCP
+// and scripts/build.sh load the identical --reg list out of one home.
+//
+// The fn entries below are copied verbatim from
+//   ~/dev/axis-lang/axis-surface-m1-config/m1-registry.axreg
+// so the §5b SHA-256-of-name identities match.
+//
+// Type decls — what this file declares vs what it leaves to siblings:
+//   Fn — INTENTIONALLY NOT DECLARED HERE. The IS requires Fn to be
+//        declared honestly (`prim fn`, as in m1-registry.axreg), not the
+//        `Fn = prim value` fudge in bridge-rs/axis-codegen-bridge.axreg.
+//        However, the currently-built axis compiler at
+//        ~/dev/axis-lang/target/release/axis
+//        rejects `prim fn` with `unknown primitive 'fn'`. Including the
+//        honest decl would break load; including the fudged decl would
+//        violate the IS. So Fn is left undeclared in the canonical set
+//        until the compiler binary supports `prim fn`. The m1 fns below
+//        do not reference Fn in their signatures, so they remain
+//        reachable without it. This impasse is an ASK for Chris.
+//   Value, ValueList — NOT re-declared here. Both are already declared in
+//        axis-bridge.axreg (Value as the closed sum, ValueList as `list Value`).
+//        Re-declaring them would conflict with the sibling decls; the m1 fn
+//        signatures below resolve against the sibling decls intentionally.
+//
+// Reconciling Value (m1-registry's `prim value` vs the closed sum here) is
+// a Day-3+ keeper concern that requires removing a sibling decl, so it is
+// surfaced as an ASK rather than acted on here.
+
+registry m1-builtins 0.1
+
+// Unit/Int/Text/Bool/Value/ValueList are declared in axis-bridge.axreg,
+// co-fed with this registry by every invocation that feeds m1-builtins.axreg.
+
+// ─────────── Value compound operations ───────────
+
+// value_make: construct a compound Value from 1-3 positional slots.
+// Arity at the call site is 1, 2, or 3 — enforced by the M1 validator.
+// Registry declares the variadic form; validator enforces the arity constraint.
+
+// value_0: extract slot 0 from a compound Value.
+// Surface validator resolves concrete return type from constructor tag.
+
+// value_1: extract slot 1 from a compound Value.
+
+// value_2: extract slot 2 from a compound Value.
+
+// ─────────── ValueList construction ───────────
+
+// list_make: construct a ValueList from elements.
+// Element type tag is mandatory at surface (enforced by validator).
+// Core IR receives bare ValueList — tag is surface-only.
+
+// ─────────── HOF operations ───────────
+
+// sort: sort a ValueList using a comparator lambda.
+// Lambda argument type is NOT checked here (trusted to AI).
+// Lambda must ultimately return Bool — enforced by leaf CCall guards.
+// filter: filter a ValueList using a predicate lambda returning Bool.
+// map: transform a ValueList element-by-element via a lambda.
+// Output element type is inferred from lambda return at the surface.
+// reduce: fold a ValueList with an accumulator lambda and initial value.
