@@ -1,4 +1,4 @@
-// axis-bridge-gfx.axreg -- the frame command stream (F24, axMachina, approved by Chris 2026-10-12): a program draws by building a frame (a byte string of drawing commands)
+// axis-bridge-gfx.axreg -- the frame command stream (F24, axMachina): a program draws by building a frame (a byte string of drawing commands)
 // and handing it to the bridge. Six foreign functions, one name, one signature and one behaviour on every bridge; the binding is axis-bridge-gfx.dispatch.toml (one row per fn:
 // a missing row for a declared fn is a build error). Frame format and rules: axis-codegen-bridge-rs src/runtime/gfx.rs. Resource and key argument per fn: axis-bridge-gfx.effects.tsv.
 // Identities are sha256(name) (§5b). A build sees these names only when it passes this file (--reg) and the dispatch file (--dispatch).

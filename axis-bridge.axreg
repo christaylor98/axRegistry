@@ -986,7 +986,7 @@ fn now_unix_nanos
   effect fullIo
 end
 // rand_bytes(n) -> n bytes from the OS CSPRNG (getrandom). For tokens, keys, nonces. Panics on n < 0 or a syscall
-// failure: no weaker fallback. L12, approved by Chris 2026-10-18. Entropy-minted identity.
+// failure: no weaker fallback. L12. Entropy-minted identity.
 fn rand_bytes
   identity 0xdb3258040b1138c507d080187053de7af6cf85bedaa82ea2178390cfbb1fb053
   kind     leaf
@@ -6444,7 +6444,7 @@ fn fail
   idempotent    false
 end
 
-// ---- HTTP server over tiny_http (bridge runtime/http.rs), approved by Chris 2026-10-18 for the axChat cockpit.
+// ---- HTTP server over tiny_http (bridge runtime/http.rs).
 // http_listen(host, port) -> server handle (127.0.0.1 keeps it local; port 0 = any free); http_port(server) -> the
 // bound port; http_next(server) -> the next parsed request id (blocks); http_method/url/body(req) -> Text;
 // http_header(req, name) -> Text, case-insensitive, "" when absent; http_reply(req, status, headers, body) answers it
